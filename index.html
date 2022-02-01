@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 
 <head>
     <meta charset="UTF-8">
@@ -22,12 +22,13 @@
                         <div class="row">
                             <label> Campos com * são de preenchimento obrigatório </label>
                             <div class="col-6">
-                                <label for="">* Valor bruto de entradas mênsal</label>
+                                <label for="">* Valor bruto de entradas (mênsal)</label>
                                 <input required type="number" class="form-control" placeholder="Bruto mênsal">
                             </div>
                             <div class="col-6">
                                 <label for="">Numero de mesês</label>
-                                <select required class="form-select" aria-label="Selecione o numero de mesês" name="" id="">
+                                <select required class="form-select" aria-label="Selecione o numero de mesês" name=""
+                                    id="">
                                     <option value="1">01</option>
                                     <option value="2">02</option>
                                     <option value="3">03</option>
@@ -43,21 +44,21 @@
                                 </select>
                             </div>
                             <div class="col-6">
-                                <label for="">Gasto fixo mênsal</label>
-                                <input required  type="number" class="form-control" placeholder="Gasto total">
+                                <label for="">Gasto fixo (mênsal)</label>
+                                <input required type="number" class="form-control" placeholder="Gasto total">
                             </div>
                             <div class="col-6">
-                                <label for="">Pagamento de divida/adiantamento </label>
-                                <input type="number" class="form-control" 
-                                    placeholder="valor total da divida a ser pago no periodo">
+                                <label for="">Pagamento de divida/adiantamento (anual)</label>
+                                <input type="number" class="form-control"
+                                    placeholder="Valor total da divida a ser pago no periodo">
                             </div>
                             <div class="col-6">
-                                <label for="">Fundo de reserva de emegencia</label>
-                                <input type="number" class="form-control"  placeholder="">
+                                <label for="">Fundo de reserva de emegencia (mênsal)</label>
+                                <input type="number" class="form-control" placeholder="Reserva de emegencia">
                             </div>
                             <div class="col-6">
-                                <label for="">Investimentos</label>
-                                <input type="number"  class="form-control" placeholder="">
+                                <label for="">Investimentos (mênsal)</label>
+                                <input type="number" class="form-control" placeholder="Investimentos ">
                             </div>
                         </div>
                         <div class="mt-3 ml-2">
@@ -73,7 +74,7 @@
 
     <div id="cardResult" class="card shadow col-11 m-auto mt-3 d-none">
         <header class="card-header">
-            <strong class="align-self-center"> Resultado da prospecção financeira </strong>
+            <strong class="align-self-center"> Resultado da prospecção financeira. </strong>
         </header>
         <div class="card-body">
             <div class="row">
@@ -93,7 +94,9 @@
         let form = document.getElementById('form');
         form.addEventListener('submit', e => {
             e.preventDefault();
-            getValInput(e)
+            let valInputs = getValInput(e);
+            let calculo = calc(valInputs);
+            innerResult(calculo)
         });
 
         const getValInput = e => {
@@ -102,15 +105,14 @@
                 arr.push(input.value);
             }
             let [bruto, meses, gasto, pagamentoAdiantemento, reserva, investimento] = arr;
-            let obj = {
+            return {
                 "bruto": bruto,
                 "meses": meses,
-                "gasto": gasto, 
+                "gasto": gasto,
                 "pagamentoAdiantemento": pagamentoAdiantemento ?? 0,
                 "reserva": reserva ?? 0,
                 "investimento": investimento ?? 0
             };
-            innerResult(calc(obj));
         };
 
         const calc = data => {
@@ -120,16 +122,19 @@
             let Insertesa = sobra / 10;
             return {
                 "sobra": sobra - Insertesa,
-                "reserva": reserva,
-                "investimento": investimento,
+                "reserva": reserva ?? 0,
+                "investimento": investimento ?? 0,
                 "meses": data.meses,
-                "pagamentoAdiantemento": data.pagamentoAdiantemento
+                "pagamentoAdiantemento": data.pagamentoAdiantemento ?? 0
             }
         };
 
         const innerResult = data => {
-            console.log(data)
-            let html = `Ao final dos ${data.meses} você tera um total de ${data.sobra} para gastar durante o ano, ou ${ (parseFloat(data.sobra) / parseFloat(data.meses)).toFixed(2)} por mês, a quitação ou adiantamento da divida de ${data.pagamentoAdiantemento}, uma reserva de emergencia de ${data.reserva}, um patrimonio de ${data.investimento} com uma insertesa de 10% `;
+            let html = `Ao final de ${data.meses} ${data.meses > 1 ? "mesês" : "mês"} você tera um total de ${data.sobra} para gastar durante o periodo,
+            ou ${(parseFloat(data.sobra) / parseFloat(data.meses)).toFixed(2)} por mês.
+            A quitação ou adiantamento da dívida de ${data.pagamentoAdiantemento}.
+            Uma reserva de emergência de ${data.reserva}.
+            Um patrimonio de ${data.investimento} com uma incerteza de 10%.`;
             document.getElementById("result").innerText = html;
             document.getElementById("cardResult").classList.remove("d-none")
         };
